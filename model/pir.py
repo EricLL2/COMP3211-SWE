@@ -126,18 +126,22 @@ def minute_floor(dt: datetime) -> datetime:
     return dt.replace(second=0, microsecond=0)
 
 
-def parse_datetime(value: datetime | str) -> datetime:
-    """Parse a timezone-aware instant; default zone is Hong Kong Time."""
+def parse_datetime(value: datetime | str, field: str = "datetime") -> datetime:
+    """Parse a timezone-aware instant; default zone is Hong Kong Time.
+
+    `field` names the value in the error raised for a blank or `none` answer,
+    for example `start is required`.
+    """
     if isinstance(value, datetime):
         dt = value
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=HKT)
         return require_hkt_range(minute_floor(dt))
     if is_blank(value) or not isinstance(value, str):
-        raise ValidationError("datetime is required")
+        raise ValidationError(f"{field} is required")
     raw = value.strip()
     if raw.casefold() == CLEAR:
-        raise ValidationError("datetime is required")
+        raise ValidationError(f"{field} is required")
     text = raw
     if text.endswith(("Z", "z")):
         text = text[:-1] + "+00:00"
@@ -256,7 +260,7 @@ class AbsoluteAlarm:
     """Alarm at a stored instant. Changing start does not move it."""
 
     def __init__(self, at: datetime | str):
-        self.at = parse_datetime(at)
+        self.at = parse_datetime(at, "alarm time")
 
     def effective(self, start: datetime) -> datetime:
         """The stored instant; `start` is ignored."""
@@ -497,7 +501,7 @@ class Event(PIR):
     ):
         super().__init__(pir_id)
         self.description = require_text(description, "description")
-        self.start = parse_datetime(start)
+        self.start = parse_datetime(start, "start")
         self.alarms = parse_alarms(alarms)
         # Reject at entry so due_alarms, print, and search never meet an overflow.
         check_alarm_times(self.start, self.alarms)
@@ -541,7 +545,7 @@ class Event(PIR):
         if "description" in fields:
             new_description = require_text(fields["description"], "description")
         if "start" in fields:
-            new_start = parse_datetime(fields["start"])
+            new_start = parse_datetime(fields["start"], "start")
         if "alarms" in fields:
             new_alarms = parse_alarms(fields["alarms"])
         # Validate against the new start before any attribute changes (atomic modify).

@@ -99,6 +99,10 @@ def read_pim_file(path: str | os.PathLike[str]) -> tuple[int, list[PIR]]:
     except UnicodeDecodeError as exc:
         # A ValueError, not an OSError: without this branch it escapes as a traceback.
         raise FileFormatError("file is not UTF-8 text") from exc
+    except (ValueError, RecursionError) as exc:
+        # JSON the decoder cannot hold: an integer longer than Python's digit
+        # limit (ValueError) or arrays nested too deeply (RecursionError).
+        raise FileFormatError("file is not valid JSON") from exc
     except OSError as exc:
         raise FileFormatError(f"cannot read file: {exc}") from exc
     if not isinstance(payload, dict):
