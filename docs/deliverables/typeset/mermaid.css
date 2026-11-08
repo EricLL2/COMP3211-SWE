@@ -1,0 +1,5 @@
+/* Diagram styling for the typeset PDFs: Source Sans 3 (shipped with TeX Live)
+   to match the document headings, falling back to Helvetica Neue. */
+@font-face { font-family: "Source Sans 3"; font-weight: 400; src: local("Source Sans 3"), local("SourceSans3-Regular"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 600; src: local("Source Sans 3 Semibold"), local("SourceSans3-Semibold"); }
+.classTitle, .classTitleText { font-weight: 600; }

@@ -1,0 +1,324 @@
+% Typesetting template for the COMP3211 PIM course documents.
+%
+% Used by docs/deliverables/build.sh together with filter.lua. The Markdown
+% files stay the single source of the text; this template supplies the page
+% design: title page, contents, running headers, requirement blocks, tables,
+% code listings, and figure captions.
+\documentclass[
+  a4paper,
+  fontsize=10.5pt,
+  parskip=half-,
+  headsepline=0.4pt,
+  footsepline=false,
+  toc=flat,
+  numbers=noenddot,
+  captions=tableheading,
+]{scrartcl}
+
+% ---------------------------------------------------------------- geometry
+\usepackage[
+  a4paper,
+  left=25mm, right=25mm,
+  top=30mm, bottom=28mm,
+  headheight=14pt, headsep=9mm,
+  footskip=13mm,
+]{geometry}
+
+% ---------------------------------------------------------------- fonts
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Charter}[
+  UprightFont = * Roman,
+  BoldFont = * Bold,
+  ItalicFont = * Italic,
+  BoldItalicFont = * Bold Italic,
+]
+\setsansfont{SourceSans3}[
+  Extension = .otf,
+  UprightFont = *-Regular,
+  ItalicFont = *-RegularIt,
+  BoldFont = *-Semibold,
+  BoldItalicFont = *-SemiboldIt,
+  FontFace = {sb}{n}{*-Semibold},
+  FontFace = {b}{n}{*-Bold},
+  Scale = MatchLowercase,
+  Ligatures = TeX,
+]
+\IfFontExistsTF{JetBrains Mono}{%
+  \setmonofont{JetBrains Mono}[Scale=0.84, Ligatures=NoCommon, Contextuals=NoAlternate]%
+}{%
+  \setmonofont{Menlo}[Scale=0.84]%
+}
+\newfontfamily\symbolfallback{Apple Symbols}
+\linespread{1.08}
+\usepackage[protrusion=true, expansion=false]{microtype}
+
+% ---------------------------------------------------------------- colours
+\usepackage[table]{xcolor}
+\definecolor{accent}{HTML}{1F3A5F}
+\definecolor{accentsoft}{HTML}{2F5E8E}
+\definecolor{ink}{HTML}{1B232C}
+\definecolor{muted}{HTML}{5A6573}
+\definecolor{rulegray}{HTML}{C7CFD9}
+\definecolor{tablehead}{HTML}{E6ECF3}
+\definecolor{tablezebra}{HTML}{F6F8FB}
+\definecolor{codebg}{HTML}{F5F7FA}
+\definecolor{codeborder}{HTML}{DCE2EA}
+\definecolor{codefg}{HTML}{22313F}
+\color{ink}
+
+% ---------------------------------------------------------------- packages
+\usepackage{graphicx}
+\usepackage{longtable, booktabs, array, calc}
+\usepackage{colortbl}
+\usepackage{fancyvrb}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage{float}
+\usepackage{ragged2e}
+\usepackage{scrlayer-scrpage}
+\usepackage[
+  font={small,sf}, labelfont={bf,color=accent}, labelsep=period,
+  justification=raggedright, singlelinecheck=false, skip=8pt,
+]{caption}
+
+% ---------------------------------------------------------------- headings
+\setkomafont{disposition}{\sffamily\bfseries\color{accent}}
+\setkomafont{section}{\LARGE}
+\setkomafont{subsection}{\Large}
+\setkomafont{subsubsection}{\large}
+\setkomafont{paragraph}{\normalsize}
+\setkomafont{minisec}{\sffamily\bfseries\color{accent}}
+\RedeclareSectionCommand[beforeskip=-26pt plus -4pt minus -2pt, afterskip=10pt]{section}
+\RedeclareSectionCommand[beforeskip=-18pt plus -3pt minus -2pt, afterskip=6pt]{subsection}
+\RedeclareSectionCommand[beforeskip=-14pt plus -2pt minus -2pt, afterskip=4pt]{subsubsection}
+\renewcommand*{\sectionformat}{\textcolor{accentsoft}{\thesection}\hspace{0.7em}}
+\renewcommand*{\subsectionformat}{\textcolor{accentsoft}{\thesubsection}\hspace{0.6em}}
+\renewcommand*{\subsubsectionformat}{\textcolor{accentsoft}{\thesubsubsection}\hspace{0.5em}}
+% A hairline under each top-level heading.
+\makeatletter
+\renewcommand{\sectionlinesformat}[4]{%
+  \Ifstr{#1}{section}{%
+    \parbox[t]{\linewidth}{\raggedright\@hangfrom{\hskip #2#3}{#4}\par
+      \vspace{-0.45\baselineskip}{\color{rulegray}\rule{\linewidth}{0.6pt}}}%
+  }{\@hangfrom{\hskip #2#3}{#4}}%
+}
+\makeatother
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+% ---------------------------------------------------------------- contents
+\DeclareTOCStyleEntry[
+  entryformat=\sffamily\bfseries\color{accent},
+  pagenumberformat=\sffamily\bfseries\color{accent},
+  beforeskip=7pt plus 1pt,
+]{tocline}{section}
+\DeclareTOCStyleEntry[
+  entryformat=\sffamily,
+  pagenumberformat=\sffamily,
+  indent=1.9em, numwidth=2.6em,
+]{tocline}{subsection}
+\DeclareTOCStyleEntry[
+  entryformat=\sffamily,
+  pagenumberformat=\sffamily,
+  numwidth=2.2em,
+]{tocline}{figure}
+\renewcommand*{\figureformat}{\figurename~\thefigure}
+
+% ---------------------------------------------------------------- page style
+\pagestyle{scrheadings}
+\clearpairofpagestyles
+\setkomafont{pageheadfoot}{\sffamily\footnotesize\color{muted}}
+\setkomafont{pagenumber}{\sffamily\footnotesize\color{muted}}
+\setkomafont{headsepline}{\color{rulegray}}
+\ihead{$if(short-title)$$short-title$$else$$title$$endif$}
+\ohead{$course-code$ \textperiodcentered\ $group$}
+\ifoot{$title$ \textperiodcentered\ Version $version$}
+\ofoot{Page \thepage\ of \pageref*{pim@lastpage}}
+\makeatletter
+\AtEndDocument{\label{pim@lastpage}}
+\makeatother
+
+% ---------------------------------------------------------------- lists
+\setlist{itemsep=2pt, topsep=4pt, parsep=1pt, labelsep=0.55em}
+\setlist[itemize,1]{label=\textcolor{accentsoft}{\small\textbullet}, leftmargin=1.4em}
+\setlist[itemize,2]{label=\textcolor{accentsoft}{\textendash}, leftmargin=1.3em}
+\setlist[enumerate,1]{label=\textcolor{accentsoft}{\sffamily\bfseries\arabic*.}, leftmargin=1.6em}
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+
+% ---------------------------------------------------------------- code
+% Inline code: the filter escapes the text and adds break points.
+\newcommand{\pimcode}[1]{\texttt{\textcolor{codefg}{#1}}}
+% A space inside inline code: breakable, but never stretched by justification.
+\newcommand{\pimsp}{\hskip\fontdimen2\font\relax}
+% Code blocks: a tinted, framed box; every listing in these documents is short.
+\newsavebox{\pimcodebox}
+\newenvironment{pimcodeblock}{%
+  \par\addvspace{4pt}\noindent
+  \begin{lrbox}{\pimcodebox}%
+  \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}%
+}{%
+  \end{minipage}%
+  \end{lrbox}%
+  {\setlength{\fboxsep}{7pt}\fcolorbox{codeborder}{codebg}{\usebox{\pimcodebox}}}%
+  \par\addvspace{6pt}%
+}
+\fvset{fontsize=\small, formatcom=\color{codefg}, baselinestretch=1.05}
+
+% ---------------------------------------------------------------- tables
+\setlength{\aboverulesep}{0pt}
+\setlength{\belowrulesep}{0pt}
+\setlength{\heavyrulewidth}{0.8pt}
+\setlength{\lightrulewidth}{0.5pt}
+\setlength{\tabcolsep}{5pt}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{8pt}
+\newcommand{\pimcellstart}{\rule{0pt}{2.55ex}}
+\newcommand{\pimcellend}{\rule[-1.15ex]{0pt}{0pt}}
+\newcommand{\pimtablefont}{\sffamily\small\setlength{\parskip}{2pt}}
+\newcommand{\pimhead}[1]{\textcolor{accent}{\bfseries #1}}
+
+% ---------------------------------------------------------------- requirements
+% One requirement: the id hangs in the left margin column, the statement,
+% rationale, and verification sit in the body column.
+\newlength{\pimreqindent}
+\setlength{\pimreqindent}{17mm}
+\newenvironment{requirement}[2]{%
+  \begin{list}{}{%
+    \setlength{\leftmargin}{\pimreqindent}%
+    \setlength{\labelwidth}{\pimreqindent}%
+    \setlength{\labelsep}{0pt}%
+    \setlength{\itemindent}{0pt}%
+    \setlength{\topsep}{7pt}%
+    \setlength{\parsep}{4pt}%
+    \setlength{\listparindent}{0pt}%
+  }%
+  \item[{\makebox[\pimreqindent][l]{\sffamily\bfseries\color{accent}#1}}]%
+  \ifstrempty{#2}{}{{\sffamily\bfseries\color{accent}#2}\par\nopagebreak}%
+}{\end{list}}
+\newenvironment{reqgroup}{%
+  \begin{list}{}{%
+    \setlength{\leftmargin}{\pimreqindent}%
+    \setlength{\topsep}{4pt}%
+    \setlength{\parsep}{3pt}%
+  }\item\relax
+}{\end{list}}
+\newcommand{\pimrationale}[1]{{\small\itshape\color{muted}#1\par}}
+\newcommand{\pimverification}[2]{%
+  {\sffamily\small\raggedright\color{muted}\textbf{#1}\hspace{0.45em}#2\par}}
+
+% ---------------------------------------------------------------- figures
+% Keep each diagram where the text discusses it.
+\floatplacement{figure}{H}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{%
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}\fi
+}
+\makeatother
+\setlength{\textfloatsep}{14pt plus 4pt minus 2pt}
+\setlength{\floatsep}{12pt plus 3pt minus 2pt}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.75}
+
+% ---------------------------------------------------------------- misc
+\frenchspacing
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\emergencystretch=2em
+\raggedbottom
+\PassOptionsToPackage{hyphens}{url}
+\usepackage{bookmark}
+\urlstyle{same}
+\hypersetup{
+  pdftitle={$title$ -- $subtitle$},
+  pdfauthor={$course-code$ $group$},
+  pdfsubject={$course$, $term$},
+  colorlinks=true,
+  linkcolor=accent,
+  urlcolor=accentsoft,
+  citecolor=accent,
+  bookmarksnumbered=true,
+  pdfcreator={XeLaTeX},
+}
+
+\begin{document}
+
+% ---------------------------------------------------------------- title page
+\begin{titlepage}
+  \newgeometry{left=25mm, right=25mm, top=24mm, bottom=24mm}
+  \sffamily\raggedright
+  \setlength{\parskip}{0pt}\hyphenpenalty=10000\exhyphenpenalty=10000
+  \setlength{\aboverulesep}{0.5ex}\setlength{\belowrulesep}{0.7ex}
+  \noindent
+  \begin{minipage}[t]{0.62\linewidth}
+    {\small\bfseries\color{accent}\MakeUppercase{$course$}}\\[2pt]
+    {\small\color{muted}$department$}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.34\linewidth}\raggedleft
+    {\small\bfseries\color{accent}$term$}\\[2pt]
+    {\small\color{muted}$deliverable$}
+  \end{minipage}
+
+  \vspace{4mm}
+  {\color{rulegray}\rule{\linewidth}{0.6pt}}
+
+  \vspace*{46mm}
+  {\fontsize{12}{14}\selectfont\bfseries\color{accentsoft}\MakeUppercase{$subtitle$}\par}
+  \vspace{4mm}
+  {\fontsize{32}{37}\selectfont\bfseries\color{accent}$title$\par}
+  \vspace{8mm}
+  {\color{accent}\rule{28mm}{2.2pt}\par}
+
+  \vspace{12mm}
+  {\small
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{@{}>{\color{muted}}l>{\color{ink}}l@{}}
+    Document\hspace{14mm} & $title$ \\
+    Version & $version$ \\
+    Date & $date$ \\
+    Group & $group$ \\
+    Status & $status$ \\
+  \end{tabular}\par}
+
+  \vfill
+  {\small\bfseries\color{accent}Group members\par}
+  \vspace{2.5mm}
+  {\small
+  \renewcommand{\arraystretch}{1.35}
+  \arrayrulecolor{rulegray}
+  \begin{tabular}{@{}>{\color{ink}}p{95mm}>{\color{ink}}p{55mm}@{}}
+    \toprule
+    \textcolor{muted}{Name} & \textcolor{muted}{Student ID} \\
+    \midrule
+$for(members)$
+    $members.name$ & $members.id$ \\
+$endfor$
+    \bottomrule
+  \end{tabular}\par}
+  \restoregeometry
+\end{titlepage}
+
+$if(toc)$
+{\hypersetup{linkcolor=ink}
+\tableofcontents
+$if(lof)$
+\vspace{6mm}
+\listoffigures
+$endif$
+}
+\clearpage
+$endif$
+
+$body$
+
+\end{document}
