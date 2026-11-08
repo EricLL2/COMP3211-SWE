@@ -50,7 +50,7 @@ class AppCreateModifyDeleteTests(unittest.TestCase):
         self.assertEqual(app.pim.all(), [])
 
     def test_modify_keeps_id_empty_fields_are_noop(self):
-        """US4: `modify` keeps the Id and only changes supplied fields; an empty modify reports `No changes`."""
+        """US6: `modify` keeps the Id and only changes supplied fields; an empty modify reports `No changes`."""
         app = App(make_fixture())
         app.select_id(1)
         updated = app.modify({"text": "Shopping: Bread"})
@@ -76,7 +76,7 @@ class AppCreateModifyDeleteTests(unittest.TestCase):
         self.assertEqual(app.pim.get(1).text, "Shopping: Milk")
 
     def test_delete_selected_and_missing_selection(self):
-        """US5: delete with no Selection fails; deleting Id 2 clears the Selection and never reuses its Id."""
+        """US9: delete with no Selection fails; deleting Id 2 clears the Selection and never reuses its Id."""
         app = App(make_fixture())
         self.assertFalse(app.delete_selected())
         self.assertEqual(app.status, "no PIR selected")

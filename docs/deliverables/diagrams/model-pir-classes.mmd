@@ -31,6 +31,7 @@ classDiagram
         +text_value(field: str) str
         +time_values(field: str) list~datetime~
         +relevant_time() datetime
+        +display_field(key: str) str
         +modify(fields: dict) None
         +to_json() dict
         +detail_lines() list
@@ -74,6 +75,14 @@ classDiagram
         +str description
         +key() tuple
     }
+    class FieldSpec {
+        <<dataclass>>
+        +str key
+        +str label
+        +str kind
+        +bool required
+    }
+    PIR "1" *-- "1..*" FieldSpec : FIELDS
     PIR <|-- Note
     PIR <|-- Task
     PIR <|-- Event

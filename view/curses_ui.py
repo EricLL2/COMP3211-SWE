@@ -74,8 +74,10 @@ HELP_LINES = (
     "  :            type a full verb command",
     "  ?            this help",
     "",
-    "Selectors: arrows, a letter or number, Enter. Esc cancels.",
-    "Dates: month grid + 15-minute times. Do not type ISO.",
+    "Selectors: arrows, a letter or number, Enter. Esc cancels",
+    "  (unsaved changes: press c to cancel).",
+    "Dates: month grid + 15-minute times. In a search, type",
+    "  the time, e.g. start < 2026-11-20 20:00.",
     "",
     MENU,
     "",
@@ -859,6 +861,14 @@ class CursesUI:
         if ch in (27, "\x1b"):
             self._escape()
             return True
+        # An option's own shortcut wins over the h/j/k/l movement keys, so
+        # `h` picks "1 hour" or "Hour" on the alarm selectors.
+        if isinstance(ch, str) and len(ch) == 1:
+            picked = chooser.pick_key(ch)
+            if picked is not None:
+                self.choice_index = picked
+                self._chooser_submit(chooser)
+                return True
         if ch in (curses.KEY_LEFT, curses.KEY_UP, "h", "k"):
             self.choice_index = chooser.move(self.choice_index, -1)
             return True
@@ -871,12 +881,6 @@ class CursesUI:
         if ch in (curses.KEY_END,):
             self.choice_index = chooser.clamp(len(chooser.options) - 1)
             return True
-        if isinstance(ch, str) and len(ch) == 1:
-            picked = chooser.pick_key(ch)
-            if picked is not None:
-                self.choice_index = picked
-                self._chooser_submit(chooser)
-                return True
         return True
 
     def _chooser_submit(self, chooser: Chooser) -> None:

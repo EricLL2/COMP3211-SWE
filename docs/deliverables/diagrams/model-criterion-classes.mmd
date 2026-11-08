@@ -1,6 +1,10 @@
 %%{init: {"markdownAutoWrap": false}}%%
 classDiagram
     direction TB
+    class parse_criterion {
+        <<function>>
+        +parse_criterion(text: str) Criterion
+    }
     class Criterion {
         <<abstract>>
         +matches(pir: PIR) bool
@@ -28,39 +32,13 @@ classDiagram
     class Not {
         +Criterion inner
     }
-
-    class PIMError {
-        <<exception>>
-        +status_message() str
-    }
-    class ValidationError
-    class NotFound
-    class ParseError {
-        +status_message() str
-    }
-    class DirtyLoadError
-    class FileFormatError {
-        +status_message() str
-    }
-    class ExtensionError
-    class parse_criterion {
-        <<function>>
-        +parse_criterion(text: str) Criterion
-    }
+    parse_criterion ..> Criterion : builds
     Criterion <|-- TypeIs
     Criterion <|-- Contains
     Criterion <|-- TimeCompare
     Criterion <|-- And
     Criterion <|-- Or
     Criterion <|-- Not
-    And o-- "2" Criterion
-    Or o-- "2" Criterion
-    Not o-- "1" Criterion
-    parse_criterion ..> Criterion : builds
-    parse_criterion ..> ParseError : raises
-    PIMError <|-- ValidationError
-    PIMError <|-- NotFound
-    PIMError <|-- ParseError
-    PIMError <|-- DirtyLoadError
-    PIMError <|-- FileFormatError
-    PIMError <|-- ExtensionError
+    And o-- "2" Criterion : children
+    Or o-- "2" Criterion : children
+    Not o-- "1" Criterion : child

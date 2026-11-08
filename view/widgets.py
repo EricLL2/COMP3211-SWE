@@ -283,7 +283,7 @@ def dirty_chooser(title: str) -> Chooser:
             Choice("cancel", "Cancel", "c", None),
         ),
         default=2,
-        hint="← →  s / d / c  Enter  Esc",
+        hint="← →  s / d / c  Enter",
     )
 
 

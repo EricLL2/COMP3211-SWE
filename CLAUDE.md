@@ -1,4 +1,4 @@
-# AGENTS.md
+# CLAUDE.md
 
 Durable instruction set for AI agents working in this repository.
 
@@ -8,10 +8,10 @@ This is not a quick-start and not an implementation snapshot. User-facing overvi
 
 If anything conflicts, follow this order:
 
-1. `Project Description.pdf` (the COMP3211 brief; cannot be waived)
+1. `docs/Project Description.pdf` (the COMP3211 brief; cannot be waived)
 2. `docs/deliverables/SRS.md` (requirements and glossary)
 3. `docs/deliverables/DESIGN.md` (architecture, classes, file format; §5 design decisions)
-4. `AGENTS.md`
+4. `CLAUDE.md`
 5. `README.md`
 
 Do not reopen locked decisions. Do not add decisions that contradict accepted ones. If a genuine conflict with the brief appears, stop and tell the user; do not patch around it.
@@ -25,7 +25,8 @@ python3 -m unittest                                 # all three layers
 python3 -m unittest discover -s tests/unit -t .     # or tests/integration, tests/e2e
 python3 coverage_report.py                          # writes coverage.txt; must be 100% of model/
 git config core.hooksPath hooks                     # once per clone: enable the gate
-sh docs/deliverables/build.sh                       # graded PDFs -> dist/ (needs pandoc, xelatex, mmdc)
+sh docs/deliverables/build.sh                       # typeset PDFs next to their sources (needs pandoc, xelatex, mmdc)
+python3 docs/presentation/build_deck.py             # presentation deck (needs python-pptx)
 ```
 
 ## Project intent
@@ -130,7 +131,8 @@ Use the SRS glossary terms as written. Forbidden substitutions:
 - Do not add separate product, architecture, acceptance, or glossary files; the SRS and the design document are the only specifications.
 - Do not add dated plan files or separate decision records (ADRs). Open work, manual checks, and known gaps go in `docs/BACKLOG.md`; move an item to its Done table when it lands.
 - Honour Declaration: GenAI use is allowed if acknowledged. Do not invent a false “no GenAI” claim. Contribution splits are the group’s, not the agent’s.
-- The SRS, DESIGN, manuals, and `REQUIREMENTS.md` are graded as PDFs. Keep repo-only notes in `<!-- -->` comments (pandoc drops them), and never cite files a grader won't have. After changing a table, rebuild and look at `dist/*.pdf`: the dash counts in a pipe table's separator row set the column widths.
+- Every document lives under `docs/` (the graded ones in `docs/deliverables/`), except `README.md`, this file, and the two reports the brief requires in the root folder of the source code: `REQUIREMENTS.md` and `coverage.txt`, with their PDFs. Do not add documents at the root.
+- The SRS, DESIGN, manuals, and `REQUIREMENTS.md` are graded as PDFs. Keep repo-only notes in `<!-- -->` comments (pandoc drops them), and never cite files a grader won't have. After changing a document, rebuild it (`sh docs/deliverables/build.sh SRS`) and look at the PDF next to its source: the dash counts in a pipe table's separator row set the column widths. The typeset PDFs are tracked in git; commit them with the Markdown change. The page design lives in `docs/deliverables/typeset/`; title-page details (group number, members) in `docs/deliverables/group.yaml`.
 - `hooks/pre-commit` rewrites `coverage.txt`. If it changes, commit it with the change that caused it.
 - To stage a file already removed with `git rm`, use `git add -A -- <paths>`. A plain `git add` of that path fails and aborts an `&&` chain.
 - To try the curses UI by hand, run it under tmux with `HOME` set to a temporary folder, so the folder browser and `~` paths don't touch your real home folder.
@@ -179,7 +181,7 @@ Each commit has **one job**. Prefer a few medium-sized commits over one dump of 
 When staging, split if any of these is true:
 
 - different **types** (`feat` vs `fix` vs `refactor` vs `docs` vs `test`)
-- different **layers** (`model` vs `view`/`controller` vs manuals vs `AGENTS.md`)
+- different **layers** (`model` vs `view`/`controller` vs manuals vs `CLAUDE.md`)
 - independent behaviour a reviewer could accept or revert on its own
 
 Do this even when the user said “implement/fix/refactor all of this” in one request, and even when the agent produced every file in one session. Implement together if that is faster; **commit separately**.

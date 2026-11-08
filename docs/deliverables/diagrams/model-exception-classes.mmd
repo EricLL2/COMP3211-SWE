@@ -1,0 +1,26 @@
+%%{init: {"markdownAutoWrap": false}}%%
+classDiagram
+    direction TB
+    class Exception {
+        <<Python built-in>>
+    }
+    class PIMError {
+        +status_message() str
+    }
+    class ValidationError
+    class NotFound
+    class ParseError {
+        +status_message() str
+    }
+    class DirtyLoadError
+    class FileFormatError {
+        +status_message() str
+    }
+    class ExtensionError
+    Exception <|-- PIMError
+    PIMError <|-- ValidationError
+    PIMError <|-- NotFound
+    PIMError <|-- ParseError
+    PIMError <|-- DirtyLoadError
+    PIMError <|-- FileFormatError
+    PIMError <|-- ExtensionError

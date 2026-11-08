@@ -220,6 +220,21 @@ class WizardErrorTests(unittest.TestCase):
         )
         self.assertEqual(app.pim.all(), [])
 
+    def test_piped_input_ending_with_unsaved_changes_says_so(self):
+        """FR-37/NFR-5: when redirected input ends while the collection is dirty, the
+        session ends without saving and prints "input ended: unsaved changes were not saved"."""
+        import io
+
+        from view.terminal import Terminal
+
+        stdout = io.StringIO()
+        app = App(PIM())
+        term = Terminal(app, stdin=io.StringIO("create note\nhello\n"), stdout=stdout)
+        term.run()
+        self.assertFalse(term._running)
+        self.assertTrue(app.is_dirty())
+        self.assertIn("input ended: unsaved changes were not saved", stdout.getvalue())
+
 
 class EventLoopErrorTests(unittest.TestCase):
     def test_oserror_during_save_becomes_status_not_crash(self):

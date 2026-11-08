@@ -416,19 +416,20 @@ class Terminal:
             self._eof_on_dirty_prompt()
 
     def _eof_on_dirty_prompt(self):
+        """End of input while save / discard / cancel is open.
+
+        On a TTY the user can still answer, so the question stays. Redirected
+        input has no more answers: the session ends without saving, and the
+        status is painted first so the loss is never silent (NFR-5).
+        """
         if self.stdin.isatty():
             self._status("enter save, discard, or cancel", STATUS_ERR)
             return
         if self._dirty_kind() == DIRTY_LOAD:
-            self._status(
-                "load cancelled: unsaved changes require save, discard, or cancel",
-                STATUS_ERR,
-            )
+            self._status("input ended: load cancelled; unsaved changes were not saved", STATUS_ERR)
         else:
-            self._status(
-                "unsaved changes; cannot quit without save, discard, or cancel",
-                STATUS_ERR,
-            )
+            self._status("input ended: unsaved changes were not saved", STATUS_ERR)
+        self._paint(force=True)
         self._running = False
 
     def _handle_command(self, line: str):

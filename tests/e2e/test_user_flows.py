@@ -78,7 +78,7 @@ class CreateModifySearchPrintDeleteTests(unittest.TestCase):
         self.assertEqual(app.pim.get(4).type_name, "contact")
 
     def test_modify_empty_enter_keeps_values_and_no_selection_fails(self):
-        """US4: `modify` with no Selection fails with `no PIR selected`; an empty prompt on a Selection reports `No changes`."""
+        """US6: `modify` with no Selection fails with `no PIR selected`; an empty prompt on a Selection reports `No changes`."""
         app, _term, out = run_script(
             [
                 "modify",
@@ -129,7 +129,7 @@ class CreateModifySearchPrintDeleteTests(unittest.TestCase):
         self.assertIn("Printed Id 1", out)
 
     def test_delete_no_keeps_yes_removes_and_id_is_not_reused(self):
-        """US5: `delete` with `n` cancels and keeps the PIR; `y` removes it and its Id is never reused by a later create."""
+        """US9: `delete` with `n` cancels and keeps the PIR; `y` removes it and its Id is never reused by a later create."""
         app, _term, out = run_script(
             [
                 *fixture_lines(),

@@ -129,6 +129,30 @@ class ErrorMessageTests(unittest.TestCase):
         self.assertIn("search syntax error", ParseError("x").status_message())
         self.assertIn("not a PIM file", FileFormatError("x").status_message())
 
+    def test_validation_messages_name_the_field_or_value_at_fault(self):
+        """NFR-9: the exact status text of each common validation error names the
+        field or the value that is wrong."""
+        cases = [
+            (lambda: Note(1, "  "), "text is required"),
+            (lambda: Task(1, ""), "description is required"),
+            (lambda: Event(1, "lecture", ""), "start is required"),
+            (lambda: Event(1, "lecture", "none"), "start is required"),
+            (lambda: Event(1, "lecture", "2026-09-14 18:30").modify({"start": " "}),
+             "start is required"),
+            (lambda: AbsoluteAlarm(""), "alarm time is required"),
+            (lambda: Contact(1, None), "name is required"),
+            (lambda: parse_datetime("next friday"), "invalid datetime: next friday"),
+            (lambda: parse_datetime("9999-12-31T23:59-10:00"), "datetime out of range"),
+            (lambda: Contact(1, "Ada").modify({"type": "note"}), "PIR type cannot be changed"),
+            (lambda: Event(1, "x", "2026-09-14 18:30", [RelativeAlarm(999999999, "week")]),
+             "alarm time is out of range"),
+        ]
+        for build, message in cases:
+            with self.subTest(message=message):
+                with self.assertRaises(ValidationError) as ctx:
+                    build()
+                self.assertEqual(ctx.exception.status_message(), message)
+
 
 class PIRBaseTests(unittest.TestCase):
     """Abstract PIR base class: hooks each PIR type must provide and default field lookups."""

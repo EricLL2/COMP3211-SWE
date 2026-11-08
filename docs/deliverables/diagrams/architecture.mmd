@@ -1,41 +1,39 @@
 flowchart TB
     user(["User at a terminal"])
+    root["<b>pim.py</b> (composition root)<br/>PIM() → App(pim) → Terminal(app) → run()"]
+
+    subgraph view["view package"]
+        curses["<b>CursesUI</b><br/>full-screen interface on a TTY"]
+        term["<b>Terminal</b><br/>prompts · line interface · Alarm Alerts"]
+        helpers["layout · widgets · file_browser · keys<br/>theme · textwidth · stdin_reader"]
+    end
+
+    subgraph controller["controller package"]
+        app["<b>App</b><br/>one user action → model calls<br/>Current Result · Selection · status line"]
+        errors["<b>errors.message_for</b><br/>exception → status line"]
+    end
+
+    subgraph model["model package"]
+        pim["<b>PIM</b><br/>Working Collection · Ids · due alarms"]
+        crit["<b>Criterion</b> tree<br/>parse_criterion"]
+        pir["<b>PIR</b> classes · alarms"]
+        codec["<b>pimfile</b><br/>JSON codec · atomic write"]
+    end
+
     file[("PIM File<br/>*.pim (UTF-8 JSON)")]
 
-    subgraph root["pim.py (composition root)"]
-        main["main():<br/>PIM() → App(pim) → Terminal(app) → run()"]
-    end
-
-    subgraph view["view (package)"]
-        term["Terminal<br/>event loop, prompts, Alarm Alert"]
-        curses["CursesUI<br/>full-screen TTY front end"]
-        helpers["layout · widgets · keys<br/>theme · textwidth · stdin_reader"]
-    end
-
-    subgraph controller["controller (package)"]
-        app["App<br/>one user action → model calls<br/>Current Result · Selection · status"]
-        errors["errors.message_for<br/>exception → status line"]
-    end
-
-    subgraph model["model (package)"]
-        pim["PIM<br/>Working Collection"]
-        pir["PIR hierarchy + alarms"]
-        crit["Criterion + parse_criterion"]
-        codec["pimfile<br/>JSON codec"]
-    end
-
-    user -- "keys / lines" --> term
-    term -- "draws screen" --> user
-    term --- curses
+    user <-- "keys, lines / screen" --> curses
+    curses -- "finished answers" --> term
     term --- helpers
-    term -- "commands" --> app
-    term -. "reads PIR / DueAlarm values" .-> pir
-    app --> errors
+    term -- "one call per action" --> app
+    app --- errors
     app -- "create · modify · delete · search<br/>save · load · due_alarms" --> pim
-    pim --> pir
+    app -- "parse_criterion" --> crit
     pim --> crit
+    pim --> pir
     pim --> codec
-    codec -- "read / atomic write" --> file
-    main -.-> term
-    main -.-> app
-    main -.-> pim
+    codec -- "read · atomic write" --> file
+    view -. "uses PIR, DueAlarm, and alarm value types" .-> model
+    root -. "creates" .-> view
+    root -. "creates" .-> controller
+    root -. "creates" .-> model

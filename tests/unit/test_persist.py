@@ -106,6 +106,41 @@ class PersistTests(unittest.TestCase):
         self.assertEqual(len(pim.all()), 6)
         self.assertEqual(pim.get(1).text, "Shopping: Milk")
 
+    def test_json_too_deep_or_too_long_is_not_a_pim_file(self):
+        """FR-36: JSON nested too deeply, or an integer past Python's digit limit,
+        is reported as `not a PIM file: file is not valid JSON`; memory keeps its 6 PIRs."""
+        pim = make_fixture()
+        cases = {
+            "deep.pim": "[" * 100_000 + "]" * 100_000,
+            "long.pim": '{"format": "pim/v1", "next_id": ' + "9" * 5000 + ', "pirs": []}',
+        }
+        for name, text in cases.items():
+            with self.subTest(name=name):
+                path = self.dir / name
+                path.write_text(text, encoding="utf-8")
+                with self.assertRaises(FileFormatError) as ctx:
+                    pim.load(path, force=True)
+                self.assertEqual(
+                    ctx.exception.status_message(), "not a PIM file: file is not valid JSON"
+                )
+                self.assertEqual(len(pim.all()), 6)
+
+    def test_failed_replace_keeps_earlier_file_and_leaves_no_temp(self):
+        """FR-32/NFR-5: when the atomic replace fails, the earlier file keeps its content,
+        no temporary file is left in the folder, and the collection stays dirty."""
+        pim = PIM()
+        pim.create_note("first version")
+        path = self.dir / "keep.pim"
+        pim.save(path)
+        before = path.read_text(encoding="utf-8")
+        pim.create_note("second version")
+        with patch("model.pimfile.os.replace", side_effect=OSError("disk full")):
+            with self.assertRaises(OSError):
+                pim.save(path)
+        self.assertEqual(path.read_text(encoding="utf-8"), before)
+        self.assertEqual(sorted(p.name for p in self.dir.iterdir()), ["keep.pim"])
+        self.assertTrue(pim.is_dirty())
+
     def test_unknown_format_does_not_clobber_memory(self):
         """An unknown `format` (pim/v0) raises FileFormatError; the Working Collection keeps 6 PIRs."""
         pim = make_fixture()
