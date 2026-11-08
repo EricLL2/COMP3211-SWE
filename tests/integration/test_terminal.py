@@ -54,7 +54,7 @@ class TerminalAppCreateSearchTests(unittest.TestCase):
 
 class TerminalAppModifyDeleteTests(unittest.TestCase):
     def test_modify_keeps_id_and_empty_enter_keeps_text(self):
-        """US4: an empty `modify` prompt keeps `text` and reports `No changes`; a filled prompt updates it, keeping the Id."""
+        """US6: an empty `modify` prompt keeps `text` and reports `No changes`; a filled prompt updates it, keeping the Id."""
         app, term, _out = session(make_fixture())
         feed(term, "id 1", "modify", "")
         self.assertEqual(app.pim.get(1).text, "Shopping: Milk")
@@ -64,7 +64,7 @@ class TerminalAppModifyDeleteTests(unittest.TestCase):
         self.assertEqual(app.pim.get(1).text, "Shopping: Bread")
 
     def test_delete_confirm_yes_does_not_reuse_id(self):
-        """US5: confirming `delete` with `y` removes the PIR, and a new Note never reuses its Id."""
+        """US9: confirming `delete` with `y` removes the PIR, and a new Note never reuses its Id."""
         app, term, _out = session(make_fixture())
         feed(term, "id 2", "delete", "y")
         self.assertTrue(all(pir.id != 2 for pir in app.pim.all()))
