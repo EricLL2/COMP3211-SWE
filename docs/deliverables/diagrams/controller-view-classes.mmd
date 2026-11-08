@@ -1,31 +1,61 @@
 %%{init: {"markdownAutoWrap": false}}%%
 classDiagram
-    direction LR
+    direction TB
+    class CursesUI {
+        +Terminal term
+        +stdscr
+        +Theme theme
+        +str buffer
+        +int choice_index
+        +loop() None
+    }
     class Terminal {
         +App app
         +stdin
         +stdout
         +Queue queue
         +set dismissed
+        -list~Prompt~ _prompts
         +run() None
         +render() None
+        +screen() Screen
         +visible_due() list~DueAlarm~
-        +ask(prompt: str, handler: Callable, kind: str, chooser: Chooser, picker: DateTimePicker, browser: FileBrowser) None
+        +ask(prompt, handler, kind, chooser, picker, browser) None
+        +apply_accelerator(action: str) None
+        +cancel_prompt() None
         +current_chooser() Chooser
         +current_picker() DateTimePicker
         +current_browser() FileBrowser
-        +apply_accelerator(action: str) None
     }
-    class CursesUI {
-        +Terminal term
-        +stdscr
-        +loop() None
+    class Prompt {
+        +str label
+        +Callable handler
+        +str kind
+        +Chooser chooser
+        +DateTimePicker picker
+        +FileBrowser browser
+    }
+    class Chooser {
+        +str title
+        +tuple~Choice~ options
+        +int default
+        +move(index: int, delta: int) int
+        +pick_key(char: str) int
+        +value_at(index: int) str
+    }
+    class DateTimePicker {
+        +date day
+        +int hour
+        +int minute
+        +value() str
+        +move_day(days: int) None
+        +move_month(months: int) None
+        +move_time(minutes: int) None
     }
     class FileBrowser {
         +str mode
         +Path cwd
         +list~Entry~ entries
-        +int index
         +move(delta: int) None
         +go_up() None
         +activate() str
@@ -53,30 +83,14 @@ classDiagram
         +current_result() list~PIR~
         +selected() PIR
     }
-    class Chooser {
-        +str title
-        +tuple~Choice~ options
-        +int default
-        +move(index: int, delta: int) int
-        +pick_key(char: str) int
-        +value_at(index: int) str
-    }
-    class DateTimePicker {
-        +str title
-        +date day
-        +int hour
-        +int minute
-        +value() str
-        +move_day(days: int) None
-        +move_month(months: int) None
-        +move_time(minutes: int) None
-    }
     class PIM {
         <<model>>
     }
-    Terminal --> App : calls
     CursesUI --> Terminal : drives on a TTY
-    Terminal --> FileBrowser : path prompts
-    Terminal --> Chooser : closed answers
-    Terminal --> DateTimePicker : date-time prompts
+    Terminal "1" o-- "0..*" Prompt : open questions
+    Prompt "1" o-- "0..1" Chooser
+    Prompt "1" o-- "0..1" DateTimePicker
+    Prompt "1" o-- "0..1" FileBrowser
+    CursesUI ..> Prompt : operates its widget
+    Terminal --> App : calls
     App --> PIM : calls

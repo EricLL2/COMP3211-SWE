@@ -2,7 +2,7 @@
 
 What is still open before submission (20:00, 20 November 2026), and a short log of what has landed. This file replaces the dated plans that used to be in `docs/plans/`; git history and the merged pull requests keep their full text. Design decisions are in `docs/deliverables/DESIGN.md` §5.
 
-This is not a feature wishlist. Appendix B plus what the SRS specifies is the whole product (`AGENTS.md`, "Non-negotiable scope"), so nothing here adds a feature.
+This is not a feature wishlist. Appendix B plus what the SRS specifies is the whole product (`CLAUDE.md`, "Non-negotiable scope"), so nothing here adds a feature.
 
 ## Open: course deliverables
 
@@ -10,13 +10,13 @@ These belong to the group. An agent must not claim them as done.
 
 | Item | Brief | What is left |
 |---|---|---|
-| SRS | 1 (6 pts) | Group review of `docs/deliverables/SRS.md`. Add group number, member names, and student ids, then drop "draft" from the title page. |
-| Design document | 2 (5 pts) | Group review of `docs/deliverables/DESIGN.md`, same title-page edits. |
-| PDF build | 1, 2, 3 | `sh docs/deliverables/build.sh` renders every document and diagram to `dist/`. Rebuild after the last edit to any Markdown source. |
+| SRS | 1 (6 pts) | Group review of `docs/deliverables/SRS.md`. Fill in the group number, member names, and student IDs in `docs/deliverables/group.yaml`; every title page and the presentation deck read them from there. |
+| Design document | 2 (5 pts) | Group review of `docs/deliverables/DESIGN.md`. |
+| PDF build | 1, 2, 3 | `sh docs/deliverables/build.sh` typesets each document next to its source: `SRS.pdf`, `DESIGN.pdf`, `USER.pdf`, and `DEVELOPER.pdf` in `docs/deliverables/`, and `REQUIREMENTS.pdf` and `coverage.pdf` at the root, where the brief wants both reports. Pandoc only reads the Markdown; the page design is the LaTeX template and Lua filter in `docs/deliverables/typeset/`, set with XeLaTeX. The PDFs are tracked: rebuild and commit them after the last edit to any source or to `group.yaml`. `sh docs/deliverables/build.sh SRS` rebuilds one document. |
 | System video | 3d | Scripted: `python3 docs/deliverables/video/render.py` (needs `brew install vhs`, `brew install uv`, and Google Chrome) records `demo.tape` into the real curses UI with VHS, renders a caption bar per step with headless Chrome, voices each step's `# narration:` line with the Kokoro neural voice model, and composes `dist/demo.mp4` with ffmpeg: 1920×1080, about 3 min 20 s, about 2 s to read each caption before its keys. The first run downloads Kokoro (about 330 MB) into uv's and Hugging Face's caches; the voiceover adds about 4 minutes to each render. `--no-record` recomposes after a caption or narration edit; `--voice NAME` picks another Kokoro voice (default `am_eric`, a male US voice); `--engine say` uses the macOS voices instead; `--no-voice` leaves the voiceover out. Group: watch and listen, then re-render on the submission Mac so the dates are current. A member may record their own voiceover instead, reading the narration lines as the script. |
-| Presentation | 5 (4 pts) | A draft deck with speaker notes exists as a private claude.ai Slides artifact (11 slides, four speaker sections of about 70 seconds; group number, names, and the lesson's own example are placeholders); download it as PDF. Still to do: the recording. Slides as PDF and a recording as MP4, at most 5 minutes. Every member presents at least 1 minute with face and student ID card visible. Content: one create-a-PIR requirement, one criterion requirement, one search requirement, the MVC design (DESIGN §2–3), and one lesson learned (for example: US7 became unit-testable only once the model was separated from input and output). |
-| Honour Declaration | required | At the ZIP root. Acknowledge GenAI use honestly (this repository's `AGENTS.md` and history show it) and state the agreed contribution split. Missing or false: up to 30 % penalty. |
-| ZIP | all | One archive. SRS, design, and manual PDFs at the root; `REQUIREMENTS.md`/`.pdf` and `coverage.txt`/`coverage.pdf` in the source root next to `pim.py`; the Honour Declaration at the ZIP root. |
+| Presentation | 5 (4 pts) | `docs/presentation/PIM-presentation.pptx` and its PDF export `PIM-presentation.pdf`: 11 white slides in four speaker sections (A: intro and creating a PIR; B: criterion and search; C: MVC design; D: criterion tree and the unit-testing lesson), with a timed script in the notes of every slide (about 4 min 45 s including the ID shots and both clips). Slides 3 and 5 embed silent clips cut from the system video. The top-right corner is left empty for the webcam. Rebuild with `python3 docs/presentation/build_deck.py` (needs python-pptx), then export the PDF from PowerPoint (File → Export → PDF). Still to do: fill in `group.yaml`, rebuild, rehearse, and record the MP4 (at most 5 minutes; every member at least 1 minute with face and student ID card visible). |
+| Honour Declaration | required | At the ZIP root. Acknowledge GenAI use honestly (this repository's `CLAUDE.md` and history show it) and state the agreed contribution split. Missing or false: up to 30 % penalty. |
+| ZIP | all | One archive. `SRS.pdf`, `DESIGN.pdf`, `USER.pdf`, and `DEVELOPER.pdf` (from `docs/deliverables/`) at the ZIP root; `REQUIREMENTS.md`/`.pdf` and `coverage.txt`/`coverage.pdf` in the source root next to `pim.py`; the system video, the presentation PDF, and its recording; the Honour Declaration at the ZIP root. |
 
 ## Open: checks by hand
 
@@ -67,3 +67,7 @@ These do not break a requirement. Fix only if time allows; each must keep `pytho
 | 2026-09-25 | Found while scripting the demo video: the alarm-offset selector's `0`/`1` keys picked the wrong chip; PRINT, HELP, and calendar pop-ups showed the panes behind them; a long title path ran into the clock; Esc waited a full second. Added the VHS demo tape | branch `chore/demo-video-and-slides` |
 | 2026-10-13 | Demo video paced down (2:54 → 3:20) with a larger caption bar below the terminal: `render.py` combines VHS, headless Chrome, and ffmpeg | branch `chore/demo-video-pacing` |
 | 2026-10-24 | Demo video voiceover: one spoken narration line per step in `demo.tape`, synthesized with the Kokoro neural voice (macOS `say` as a fallback) and timed to the step markers; the render stops if a line would run into the next step | branch `chore/demo-video-pacing` |
+| 2026-11-08 | Third audit, documents against code. Fixed: the `h` option shortcut in selectors never fired; piped input that ended with unsaved changes exited without a word; `datetime is required` did not name the field; very deep or very long JSON gave "command failed" instead of "file is not valid JSON". Rewrote the SRS, design document, manuals, and coverage report to match the code | `main` |
+| 2026-11-08 | Typeset PDFs: custom LaTeX design (`docs/deliverables/typeset/`), vector diagrams, PDFs next to their sources instead of `dist/`; title-page details in `group.yaml` | `main` |
+| 2026-11-08 | Presentation deck built by script with speaker notes and two embedded clips, replacing the draft | `main` |
+| 2026-11-08 | Documents gathered under `docs/`: the manuals in `docs/deliverables/`, the brief in `docs/`; `AGENTS.md` renamed to `CLAUDE.md`. `REQUIREMENTS.md` and `coverage.txt` stay in the source root, as the brief requires | `main` |
