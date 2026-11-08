@@ -44,6 +44,29 @@ class CursesHelperTests(unittest.TestCase):
         ui._handle_chooser_key("\n")
         self.assertIn("description", term._prompt_label())
 
+    def test_option_shortcut_h_wins_over_the_h_movement_key(self):
+        """On the alarm selectors `h` submits "1 hour" / "hour" instead of moving left;
+        on a selector without an `h` option it still moves the highlight."""
+        from view.widgets import alarm_amount_chooser, alarm_unit_chooser
+
+        for chooser, expected in ((alarm_amount_chooser(), "1 hour"), (alarm_unit_chooser(), "hour")):
+            with self.subTest(expected=expected):
+                _app, term, _out = make_terminal()
+                answers = []
+                term.ask("question: ", answers.append, chooser=chooser)
+                ui = CursesUI(term, object())
+                ui._sync_chooser()
+                self.assertTrue(ui._handle_chooser_key("h"))
+                self.assertEqual(answers, [expected])
+
+        _app, term, _out = make_terminal()
+        term.apply_accelerator("create")
+        ui = CursesUI(term, object())
+        ui._sync_chooser()
+        ui._handle_chooser_key("l")
+        ui._handle_chooser_key("h")
+        self.assertEqual(term.current_chooser().value_at(ui.choice_index), "note")
+
     def test_delete_selector_enter_on_default_cancels(self):
         """Enter on the delete confirmation's default option cancels without calling `delete`."""
         app, term, _out = make_terminal()

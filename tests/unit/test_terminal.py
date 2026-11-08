@@ -521,14 +521,16 @@ class SaveLoadQuitTests(unittest.TestCase):
         self.assertFalse(term._running)
 
     def test_eof_on_dirty_non_tty_stops(self):
-        """EOF while the dirty-quit prompt is open still stops the Terminal and reports "unsaved changes"."""
-        app, term, _out = make_terminal()
+        """FR-37/NFR-5: redirected input that ends while the dirty-quit prompt is open stops
+        the Terminal and prints "input ended: unsaved changes were not saved" before it stops."""
+        app, term, out = make_terminal()
         app._dirty = True
         term._running = True
         feed(term, "quit")
         term._handle_eof()
         self.assertFalse(term._running)
-        self.assertIn("unsaved changes", app.status)
+        self.assertEqual(app.status, "input ended: unsaved changes were not saved")
+        self.assertIn("input ended: unsaved changes were not saved", out.getvalue())
 
     def test_load_failed_does_not_clear_dismissed(self):
         """A failed `load` leaves dismissed alarms untouched; a successful `load` clears them."""
