@@ -8,6 +8,9 @@ and comments are not counted.
 `--check` is for the pre-commit hook: same rules, and `coverage.txt` is
 written only when the total is 100% so a failing gate does not dirty the
 working tree with a miss list.
+
+The report goes to `docs/deliverables/coverage.txt`, the source of the
+typeset `COVERAGE_REPORT.pdf` at the repository root.
 """
 
 from __future__ import annotations
@@ -19,9 +22,10 @@ import unittest
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 MODEL = ROOT / "model"
 UNIT = ROOT / "tests" / "unit"
+REPORT = ROOT / "docs" / "deliverables" / "coverage.txt"
 
 # Printed at the top of coverage.txt so a reader knows how "100%" was measured.
 METHOD = [
@@ -83,10 +87,9 @@ def main() -> int:
     lines.append(f"TOTAL model/: {grand_hit}/{grand_total} lines ({pct:.1f}%)")
     report_text = "\n".join(lines) + "\n"
     complete = result.wasSuccessful() and grand_hit == grand_total and grand_total > 0
-    report = ROOT / "coverage.txt"
     if complete or not check:
-        report.write_text(report_text, encoding="utf-8")
-        sys.stderr.write(f"Wrote {report}\n")
+        REPORT.write_text(report_text, encoding="utf-8")
+        sys.stderr.write(f"Wrote {REPORT}\n")
     else:
         sys.stderr.write(report_text)
     if not result.wasSuccessful():

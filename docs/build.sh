@@ -1,30 +1,34 @@
 #!/bin/sh
-# Typeset the course documents as PDFs, each next to its Markdown source:
+# Typeset the course documents as PDFs. The sources (SRS.md, DESIGN.md,
+# USER.md, DEVELOPER.md, REQUIREMENTS.md, coverage.txt) live in
+# docs/deliverables/; every PDF is written to the source root:
 #
-#   docs/deliverables/   SRS.pdf  DESIGN.pdf  USER.pdf  DEVELOPER.pdf
-#   source root          REQUIREMENTS.pdf  coverage.pdf
+#   SRS.pdf  DESIGN_REPORT.pdf  USER_MANUAL.pdf  DEVELOPER_MANUAL.pdf
+#   REQUIREMENTS.pdf  COVERAGE_REPORT.pdf
 #
 # The brief asks for the requirements coverage report and the line-coverage
-# report in the root folder of the source code, so those two stay next to pim.py.
+# report in the root folder of the source code, so their PDFs sit next to pim.py.
 #
 # The Markdown files stay the only source of the text. The page design lives
-# in docs/deliverables/typeset/: template.tex (title page, contents, running
-# headers, tables, requirement blocks), filter.lua (turns the Markdown into
-# those LaTeX structures), and mermaid.json (diagram theme). Title-page details
-# (group number, members) come from docs/deliverables/group.yaml.
+# in docs/_typeset/: template.tex (title page, contents, running headers,
+# tables, requirement blocks), filter.lua (turns the Markdown into those LaTeX
+# structures), and mermaid.json (diagram theme). Diagram sources are in
+# docs/_diagrams/. Title-page details (group number, members) come from
+# docs/deliverables/group.yaml.
 #
 # Documentation tooling only: it is not part of the PIM implementation, so the
 # standard-library-only rule does not apply. Needs pandoc 3, XeLaTeX (MacTeX),
 # mermaid-cli (mmdc), and Google Chrome for mmdc (override with
 # PUPPETEER_EXECUTABLE_PATH). Usage from the repository root:
 #
-#     sh docs/deliverables/build.sh            # every document
-#     sh docs/deliverables/build.sh SRS DESIGN # only these
+#     sh docs/build.sh            # every document
+#     sh docs/build.sh SRS DESIGN # only these (named by their source file)
 
 set -e
-ROOT=$(cd "$(dirname "$0")/../.." && pwd)
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DOCS="$ROOT/docs/deliverables"
-TYPESET="$DOCS/typeset"
+TYPESET="$ROOT/docs/_typeset"
+DIAGRAMS="$ROOT/docs/_diagrams"
 
 for tool in pandoc xelatex mmdc python3; do
     if ! command -v "$tool" >/dev/null 2>&1; then
@@ -55,7 +59,7 @@ SANS=$(dirname "$(kpsewhich SourceSans3-Regular.otf)")
     cat "$TYPESET/mermaid.css"
 } > "$BUILD/diagram-fonts.css"
 
-for src in "$DOCS"/diagrams/*.mmd; do
+for src in "$DIAGRAMS"/*.mmd; do
     name=$(basename "$src" .mmd)
     echo "build: diagram $name"
     mmdc -q -p "$BUILD/puppeteer.json" -c "$TYPESET/mermaid.json" -C "$BUILD/diagram-fonts.css" \
@@ -64,18 +68,18 @@ done
 
 # ------------------------------------------------------------------ documents
 # Wrap the plain-text coverage report so it renders as a document.
-python3 "$TYPESET/coverage_doc.py" "$ROOT/coverage.txt" "$(date '+%-d %B %Y')" > "$BUILD/coverage.md"
+python3 "$TYPESET/coverage_doc.py" "$DOCS/coverage.txt" "$(date '+%-d %B %Y')" > "$BUILD/coverage.md"
 
 ONLY="$*"
 
 render() {
     # $1 = Markdown source, $2 = output PDF path
-    name=$(basename "$2" .pdf)
+    name=$(basename "$1" .md)
     # Optional arguments name the documents to build, e.g. "SRS DESIGN".
     if [ -n "$ONLY" ] && ! printf ' %s ' "$ONLY" | grep -q " $name "; then
         return 0
     fi
-    echo "build: $name.pdf"
+    echo "build: $(basename "$2")"
     PIM_BUILD_DIR="$BUILD" pandoc "$1" \
         --from markdown \
         --to latex \
@@ -99,11 +103,11 @@ render() {
     cp "$BUILD/$name.pdf" "$2"
 }
 
-render "$DOCS/SRS.md" "$DOCS/SRS.pdf"
-render "$DOCS/DESIGN.md" "$DOCS/DESIGN.pdf"
-render "$DOCS/USER.md" "$DOCS/USER.pdf"
-render "$DOCS/DEVELOPER.md" "$DOCS/DEVELOPER.pdf"
-render "$ROOT/REQUIREMENTS.md" "$ROOT/REQUIREMENTS.pdf"
-render "$BUILD/coverage.md" "$ROOT/coverage.pdf"
+render "$DOCS/SRS.md" "$ROOT/SRS.pdf"
+render "$DOCS/DESIGN.md" "$ROOT/DESIGN_REPORT.pdf"
+render "$DOCS/USER.md" "$ROOT/USER_MANUAL.pdf"
+render "$DOCS/DEVELOPER.md" "$ROOT/DEVELOPER_MANUAL.pdf"
+render "$DOCS/REQUIREMENTS.md" "$ROOT/REQUIREMENTS.pdf"
+render "$BUILD/coverage.md" "$ROOT/COVERAGE_REPORT.pdf"
 
 echo "build: done"

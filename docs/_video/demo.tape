@@ -1,9 +1,9 @@
-# System video (brief 3d): the demo script from docs/BACKLOG.md, typed into
+# System video (brief 3d): the demo script (see tests/e2e/test_demo.py), typed into
 # the real curses UI. Do not run this tape on its own; render.py runs it,
 # adds the caption bar, and writes dist/demo.mp4 (at most 4 minutes):
 #
 #   brew install vhs            # once; also installs ttyd
-#   python3 docs/deliverables/video/render.py   # from the repository root
+#   python3 docs/_video/render.py   # from the repository root
 #
 # The PIM runs inside tmux (demo.tmux.conf). Each step starts with a
 # `# caption: <tag> | <text>` line, which render.py reads, and flips the
@@ -39,7 +39,7 @@ Set TypingSpeed 55ms
 # caption: Start | Start the PIM. It opens with an empty, untitled collection.
 # narration: This is a command-line Personal Information Manager. It starts with an empty collection.
 Hide
-Type@1ms `export BASH_SILENCE_DEPRECATION_WARNING=1; rm -rf /tmp/pim-demo && mkdir -p /tmp/pim-demo/student/Documents && ln -s "$PWD/pim.py" /tmp/pim-demo/student/Documents/pim.py && tmux -L pimdemo -f docs/deliverables/video/demo.tmux.conf new-session -s demo -c /tmp/pim-demo/student/Documents -e HOME=/tmp/pim-demo/student -e PS1='\W $ ' -e BASH_SILENCE_DEPRECATION_WARNING=1 'bash --norc --noprofile'`
+Type@1ms `export BASH_SILENCE_DEPRECATION_WARNING=1; rm -rf /tmp/pim-demo && mkdir -p /tmp/pim-demo/student/Documents && ln -s "$PWD/pim.py" /tmp/pim-demo/student/Documents/pim.py && tmux -L pimdemo -f docs/_video/demo.tmux.conf new-session -s demo -c /tmp/pim-demo/student/Documents -e HOME=/tmp/pim-demo/student -e PS1='\W $ ' -e BASH_SILENCE_DEPRECATION_WARNING=1 'bash --norc --noprofile'`
 Enter
 Sleep 1.5s
 Type@1ms "clear"

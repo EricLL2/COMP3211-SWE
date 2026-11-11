@@ -2,10 +2,10 @@
 
 Four tools, one command, run from the repository root:
 
-    python3 docs/deliverables/video/render.py            # record, then compose
-    python3 docs/deliverables/video/render.py --no-record  # recompose only
-    python3 docs/deliverables/video/render.py --no-record --voice am_fenrir
-    python3 docs/deliverables/video/render.py --no-record --engine say
+    python3 docs/_video/render.py            # record, then compose
+    python3 docs/_video/render.py --no-record  # recompose only
+    python3 docs/_video/render.py --no-record --voice am_fenrir
+    python3 docs/_video/render.py --no-record --engine say
 
 1. VHS plays demo.tape against the real curses UI and writes
    dist/demo-raw.mp4. The tmux status line in that recording is a step
@@ -45,7 +45,7 @@ from fractions import Fraction
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[2]
+ROOT = HERE.parents[1]
 TAPE = HERE / "demo.tape"
 RAW = ROOT / "dist" / "demo-raw.mp4"
 OUT = ROOT / "dist" / "demo.mp4"

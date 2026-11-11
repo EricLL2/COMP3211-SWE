@@ -16,7 +16,7 @@ else
 fi
 
 echo "pre-commit: unit tests + 100% model/ line coverage"
-if ! "$PYTHON" coverage_report.py --check; then
+if ! "$PYTHON" tests/coverage_report.py --check; then
     echo "pre-commit: unit tests failed or model/ coverage is not 100%" >&2
     exit 1
 fi

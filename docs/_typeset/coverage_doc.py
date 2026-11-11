@@ -1,8 +1,9 @@
 """Turn coverage.txt into the Markdown source of the typeset coverage report.
 
-Documentation tooling only (run by docs/deliverables/build.sh): it reads the
-plain-text report that coverage_report.py writes at the source root and prints
-a Markdown document with a per-file table, the method, and the raw report.
+Documentation tooling only (run by docs/build.sh): it reads the plain-text
+report that tests/coverage_report.py writes to docs/deliverables/coverage.txt
+and prints a Markdown document with a per-file table, the method, and the raw
+report.
 
 Usage: python3 coverage_doc.py <coverage.txt> <date>
 """
@@ -56,7 +57,7 @@ def main(path: str, date: str) -> None:
         "",
         "# Method",
         "",
-        "The report is produced by `coverage_report.py` at the root of the source code. It uses only "
+        "The report is produced by `tests/coverage_report.py`. It uses only "
         "the Python standard library:",
         "",
         "- The standard `trace` module runs every test in `tests/unit` and records which lines of "
@@ -70,10 +71,10 @@ def main(path: str, date: str) -> None:
         "To reproduce the figures, run this command at the root of the source code:",
         "",
         "```",
-        "python3 coverage_report.py",
+        "python3 tests/coverage_report.py",
         "```",
         "",
-        "The command rewrites `coverage.txt` and exits with status 1 if a unit test fails or any "
+        "The command rewrites `docs/deliverables/coverage.txt` and exits with status 1 if a unit test fails or any "
         "countable line of `model/` is not executed.",
         "",
         "# Report output",

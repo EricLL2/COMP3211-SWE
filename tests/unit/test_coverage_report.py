@@ -3,7 +3,7 @@
 import textwrap
 import unittest
 
-from coverage_report import _countable_lines
+from tests.coverage_report import _countable_lines
 
 
 class CountableLineTests(unittest.TestCase):

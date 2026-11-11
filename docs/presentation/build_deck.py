@@ -11,15 +11,15 @@ with a timed script in the speaker notes of every slide. Speaker A is the
 first member in docs/deliverables/group.yaml, B the second, and so on. The
 top-right corner of every slide is left empty for the presenter's webcam.
 
-The two clips in media/ were cut, without sound, from the system video
-(dist/demo.mp4, made by docs/deliverables/video/render.py):
+The two clips in docs/_media/ were cut, without sound, from the system video
+(dist/demo.mp4, made by docs/_video/render.py):
 
     ffmpeg -ss 16.56 -to 30.40 -i dist/demo.mp4 -an \\
         -vf "setpts=PTS/1.3,scale=1280:-2,fps=30" -c:v libx264 -crf 22 \\
-        -pix_fmt yuv420p -movflags +faststart media/clip-create-task.mp4
+        -pix_fmt yuv420p -movflags +faststart docs/_media/clip-create-task.mp4
     ffmpeg -ss 104.80 -to 117.90 -i dist/demo.mp4 -an \\
         -vf "scale=1280:-2,fps=30" -c:v libx264 -crf 22 \\
-        -pix_fmt yuv420p -movflags +faststart media/clip-combined-search.mp4
+        -pix_fmt yuv420p -movflags +faststart docs/_media/clip-combined-search.mp4
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ from pptx.util import Inches, Pt
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-MEDIA = HERE / "media"
+MEDIA = ROOT / "docs" / "_media"
 OUT = HERE / "PIM-presentation.pptx"
 GROUP_FILE = ROOT / "docs" / "deliverables" / "group.yaml"
 
