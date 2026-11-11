@@ -1,6 +1,6 @@
 # Title-page details shared by every typeset document and the presentation.
 # Fill in the group number and the members, then rebuild:
-#     sh docs/deliverables/build.sh
+#     sh docs/build.sh
 #     python3 docs/presentation/build_deck.py
 course: "COMP3211 Software Engineering"
 course-code: "COMP3211"

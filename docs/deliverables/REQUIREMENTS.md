@@ -108,4 +108,4 @@ No user story or requirement is left unimplemented. The features listed as out o
 # 6. How the evidence was produced
 
 - `python3 -m unittest` runs all three test layers.
-- `python3 coverage_report.py` writes `coverage.txt`. It uses the standard-library `trace` module over `tests/unit` and counts the lines on which a statement starts in each file of `model/` except `__init__.py`. The method is stated at the top of `coverage.txt`.
+- `python3 tests/coverage_report.py` writes `docs/deliverables/coverage.txt`, typeset as `COVERAGE_REPORT.pdf`. It uses the standard-library `trace` module over `tests/unit` and counts the lines on which a statement starts in each file of `model/` except `__init__.py`. The method is stated at the top of `coverage.txt`.

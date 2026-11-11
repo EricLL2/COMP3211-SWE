@@ -1,4 +1,4 @@
-"""The demo script in docs/BACKLOG.md as a scripted terminal session."""
+"""The project's demo script as a scripted terminal session (also typed in docs/_video/demo.tape)."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ class DemoScriptTests(unittest.TestCase):
         self.tmpdir.cleanup()
 
     def test_demo_create_search_modify_print_save_and_reload(self):
-        """The docs/BACKLOG.md demo: create four PIRs, search, modify an Event's start, print, save, and reload."""
+        """The demo script: create four PIRs, search, modify an Event's start, print, save, and reload."""
         dest = self.dir / "demo"
         app, _term, out = run_script(
             [

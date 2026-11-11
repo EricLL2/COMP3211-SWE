@@ -8,7 +8,7 @@ This is not a quick-start and not an implementation snapshot. User-facing overvi
 
 If anything conflicts, follow this order:
 
-1. `docs/Project Description.pdf` (the COMP3211 brief; cannot be waived)
+1. `Project Description.pdf` (the COMP3211 brief, at the repository root; cannot be waived)
 2. `docs/deliverables/SRS.md` (requirements and glossary)
 3. `docs/deliverables/DESIGN.md` (architecture, classes, file format; §5 design decisions)
 4. `CLAUDE.md`
@@ -23,9 +23,9 @@ python3 pim.py                                      # curses UI on a TTY
 PIM_NO_CURSES=1 python3 pim.py                      # line UI (what tests drive)
 python3 -m unittest                                 # all three layers
 python3 -m unittest discover -s tests/unit -t .     # or tests/integration, tests/e2e
-python3 coverage_report.py                          # writes coverage.txt; must be 100% of model/
+python3 tests/coverage_report.py                    # writes docs/deliverables/coverage.txt; must be 100% of model/
 git config core.hooksPath hooks                     # once per clone: enable the gate
-sh docs/deliverables/build.sh                       # typeset PDFs next to their sources (needs pandoc, xelatex, mmdc)
+sh docs/build.sh                                    # typeset PDFs into the repository root (needs pandoc, xelatex, mmdc)
 python3 docs/presentation/build_deck.py             # presentation deck (needs python-pptx)
 ```
 
@@ -67,9 +67,9 @@ If a user or another agent asks for an out-of-scope feature, refuse it against t
 | Scope, fields, search grammar, interaction, error rules | SRS §2 and §6 (FR-1 – FR-43, NFR-1 – NFR-10) |
 | Packages, `PIM` interface, PIM File JSON, event loop | DESIGN §2–§3 |
 | Why a choice was made | DESIGN §5 |
-| Which requirement each test covers | `REQUIREMENTS.md`, and the *Verification* lines in the SRS |
+| Which requirement each test covers | `docs/deliverables/REQUIREMENTS.md`, and the *Verification* lines in the SRS |
 | Test fixture | `tests/fixture.py` |
-| Open work, demo script, ZIP layout, known UI gaps | `docs/BACKLOG.md` |
+| Demo script | `tests/e2e/test_demo.py` (the scripted demo session) |
 
 Use the SRS glossary terms as written. Forbidden substitutions:
 
@@ -111,13 +111,13 @@ Use the SRS glossary terms as written. Forbidden substitutions:
 
 - Framework: `unittest` (the brief’s example). Automatically executable, all passing.
 - Three layers, all stdlib:
-  - **Unit** (`tests/unit`): `model` (graded surface), `controller` (App/errors with a mocked PIM), and `view` (Terminal/stdin_reader with a fake App). `coverage_report.py` must report **100%** of countable `model/` lines.
+  - **Unit** (`tests/unit`): `model` (graded surface), `controller` (App/errors with a mocked PIM), and `view` (Terminal/stdin_reader with a fake App). `tests/coverage_report.py` must report **100%** of countable `model/` lines.
   - **Integration** (`tests/integration`): `controller.App` against `model.PIM`; `view.Terminal` against App+PIM on one thread (no stdin reader).
   - **E2E** (`tests/e2e`): scripted stdin through `Terminal.run()` with injected `stdin` / `stdout` / `now`.
 - Each test must state the behaviour it exercises (name or comment) and assert expected results.
 - Cover: four types create/validate/modify/delete; Id stability; contains / unqualified contains / missing-field time / and-or-not / multi-alarm; save/load round-trip; `due_alarms` with injected `now`; dirty flag; corrupt file does not clobber memory.
 - Prefer the shared fixture in `tests/fixture.py`.
-- Line-coverage report for `model/` belongs at the source root (`python3 coverage_report.py`).
+- `python3 tests/coverage_report.py` writes the line-coverage report for `model/` to `docs/deliverables/coverage.txt`. Its typeset copy, `COVERAGE_REPORT.pdf`, is the report the brief requires at the source root.
 - Pre-commit (`hooks/pre-commit`): unit tests at 100% `model/` coverage, then integration, then e2e, or the commit is refused. `git config core.hooksPath hooks`. Bypass: `git commit --no-verify`.
 
 ## Agent working rules
@@ -129,11 +129,11 @@ Use the SRS glossary terms as written. Forbidden substitutions:
 - Keep the SRS glossary domain-only: no implementation types, file paths, or Python names.
 - Do not change a requirement in the SRS or a decision in DESIGN §5 unless the user explicitly changes a product decision. Do keep both documents true to the code: when behaviour, a class, or a public method changes, update the SRS, DESIGN §3, `REQUIREMENTS.md`, and the manuals in the same change.
 - Do not add separate product, architecture, acceptance, or glossary files; the SRS and the design document are the only specifications.
-- Do not add dated plan files or separate decision records (ADRs). Open work, manual checks, and known gaps go in `docs/BACKLOG.md`; move an item to its Done table when it lands.
+- Do not add dated plan files or separate decision records (ADRs).
 - Honour Declaration: GenAI use is allowed if acknowledged. Do not invent a false “no GenAI” claim. Contribution splits are the group’s, not the agent’s.
-- Every document lives under `docs/` (the graded ones in `docs/deliverables/`), except `README.md`, this file, and the two reports the brief requires in the root folder of the source code: `REQUIREMENTS.md` and `coverage.txt`, with their PDFs. Do not add documents at the root.
-- The SRS, DESIGN, manuals, and `REQUIREMENTS.md` are graded as PDFs. Keep repo-only notes in `<!-- -->` comments (pandoc drops them), and never cite files a grader won't have. After changing a document, rebuild it (`sh docs/deliverables/build.sh SRS`) and look at the PDF next to its source: the dash counts in a pipe table's separator row set the column widths. The typeset PDFs are tracked in git; commit them with the Markdown change. The page design lives in `docs/deliverables/typeset/`; title-page details (group number, members) in `docs/deliverables/group.yaml`.
-- `hooks/pre-commit` rewrites `coverage.txt`. If it changes, commit it with the change that caused it.
+- Every document source lives under `docs/`: the graded Markdown and `coverage.txt` in `docs/deliverables/`, the deck source in `docs/presentation/`, and supporting material in the underscore folders (`docs/_diagrams/`, `docs/_typeset/`, `docs/_video/`, `docs/_media/`). The root holds only `README.md`, this file, the brief, and the submitted PDFs: `SRS.pdf`, `DESIGN_REPORT.pdf`, `USER_MANUAL.pdf`, `DEVELOPER_MANUAL.pdf`, `REQUIREMENTS.pdf`, `COVERAGE_REPORT.pdf`, and `Presentation Slides.pdf`. The brief requires the requirements coverage report and the line-coverage report in the root folder of the source code; `REQUIREMENTS.pdf` and `COVERAGE_REPORT.pdf` are those. Do not add other documents at the root.
+- The SRS, DESIGN, manuals, and `REQUIREMENTS.md` are graded as PDFs. Keep repo-only notes in `<!-- -->` comments (pandoc drops them), and never cite files a grader won't have. After changing a document, rebuild it (`sh docs/build.sh SRS`, named by source file) and look at its PDF at the root: the dash counts in a pipe table's separator row set the column widths. The typeset PDFs are tracked in git; commit them with the Markdown change. The page design lives in `docs/_typeset/`; title-page details (group number, members) in `docs/deliverables/group.yaml`.
+- `hooks/pre-commit` rewrites `docs/deliverables/coverage.txt`. If it changes, commit it with the change that caused it.
 - To stage a file already removed with `git rm`, use `git add -A -- <paths>`. A plain `git add` of that path fails and aborts an `&&` chain.
 - To try the curses UI by hand, run it under tmux with `HOME` set to a temporary folder, so the folder browser and `~` paths don't touch your real home folder.
 
@@ -200,7 +200,7 @@ Required sections, in this order:
 
 1. **Summary** — what shipped and why (user stories, design decisions, or the defect). Two to five sentences. Name the user-visible behaviour.
 2. **What changed** — bullets by layer (`model`, `view`/`controller`, tests, docs). Call out behaviour a reviewer must not miss (atomic failure, dirty load/quit, Current Result vs `print all`, injected `now`).
-3. **How to check** — exact commands (`python3 -m unittest`, `python3 pim.py`, demo steps from the demo script in `docs/BACKLOG.md`). State the platform if it matters (macOS).
+3. **How to check** — exact commands (`python3 -m unittest`, `python3 pim.py`, demo steps from the scripted demo in `tests/e2e/test_demo.py`). State the platform if it matters (macOS).
 4. **Out of scope** — explicit: extra features not in Appendix B, and course artefacts this PR does not claim (SRS, videos, Honour Declaration) when that applies.
 
 Optional when useful: **Risks / follow-ups** (known gaps, coverage holes, UI edges). **Commits** as a short list only after the summary, not instead of it.
@@ -221,7 +221,7 @@ Before calling implementation work done:
 
 1. Every FR and NFR in the SRS is met, and `REQUIREMENTS.md` shows no row as not implemented.
 2. `python3 -m unittest` is green.
-3. `python3 pim.py` can run the demo script in `docs/BACKLOG.md` on macOS with stdlib only.
+3. `python3 pim.py` can run the demo scripted in `tests/e2e/test_demo.py` on macOS with stdlib only.
 4. No third-party imports anywhere in the submitted source.
 
 SRS, typeset design document, videos, and Honour Declaration are separate deliverables. Do not claim those are done when only code is done.

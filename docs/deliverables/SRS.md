@@ -12,7 +12,7 @@ toc: true
 <!-- Source-tree note (not rendered): this SRS is the only product
 specification in the repository. Change it when a requirement changes; the
 requirement ids below are the ones REQUIREMENTS.md reports against. Build the
-PDF with `sh docs/deliverables/build.sh SRS`. -->
+PDF with `sh docs/build.sh SRS`. -->
 
 # 1. Preface
 
@@ -361,7 +361,7 @@ A row number shall select by position in the Current Result and shall not be tre
 *Verification:* measured on 24 Sep 2026 with 2,500 PIRs of each type, every Event having three alarms, taking the best of five runs. The search `type = event && description contains "comp" || alarm < 2026-10-01 00:00` took 2 ms, the alarm check 2 ms, a save 44 ms, and a load 24 ms.
 
 **NFR-8 (Testability)** Every model rule shall be testable through the public interface of `model`, without the user interface. The model unit tests shall use `unittest`, run automatically, pass, and execute every countable line of `model/`. Only `model/__init__.py`, which merely re-exports names, is excluded from the count.
-*Verification:* `python3 -m unittest`; `python3 coverage_report.py`.
+*Verification:* `python3 -m unittest`; `python3 tests/coverage_report.py`.
 
 **NFR-9 (Usability)** Prompts, messages, and manuals shall be in English. Each error message shall say what went wrong and shall name the field or value at fault when there is one, for example `description is required` or `no PIR with Id 9`.
 *Verification:* unit test `test_validation_messages_name_the_field_or_value_at_fault` and the error tests of NFR-4 assert the exact message text; inspection of the error table in the user manual.

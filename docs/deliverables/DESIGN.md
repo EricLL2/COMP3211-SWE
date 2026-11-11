@@ -13,7 +13,7 @@ lof: true
 <!-- Source-tree note (not rendered): this is the only architecture and
 design document in the repository, and Section 5 is the only record of design
 decisions. Change it when the design changes. Build the PDF with
-`sh docs/deliverables/build.sh DESIGN`. -->
+`sh docs/build.sh DESIGN`. -->
 
 # 1. Introduction
 
