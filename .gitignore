@@ -4,3 +4,4 @@ __pycache__/
 *.pim
 .DS_Store
 dist/
+.claude/
